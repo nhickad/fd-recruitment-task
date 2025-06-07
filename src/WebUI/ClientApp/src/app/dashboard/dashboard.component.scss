@@ -816,3 +816,60 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-size: 1.75rem; // Adjust for mobile
   }
 }
+
+// Add this to your dashboard.component.scss
+
+// Task Image Styles
+.task-image {
+  flex-shrink: 0;
+  margin-left: 1rem;
+  
+  .task-thumbnail {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+    
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+}
+
+// Completed Task Image Styles
+.completed-task-image {
+  flex-shrink: 0;
+  margin-left: 1rem;
+  
+  .completed-task-thumbnail {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    object-fit: cover;
+    opacity: 0.8;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// Ensure task cards have proper flex layout
+.task-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  
+  .task-main-content {
+    flex: 1;
+  }
+}
+
+.completed-task-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  
+  .completed-task-content {
+    flex: 1;
+  }
+}

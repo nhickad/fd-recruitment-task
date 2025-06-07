@@ -15,6 +15,9 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { TaskCardComponent } from './shared/task-card/task-card.component';
 import { ProgressRingComponent } from './shared/progress-ring/progress-ring.component';
 
+// Modal Components
+import { TaskModalComponent } from './shared/task-modal/task-modal.component';
+
 // Temporarily comment out API Authorization to test dashboard
 // import { ApiAuthorizationModule } from 'src/api-authorization/api-authorization.module';
 // import { AuthorizeInterceptor } from 'src/api-authorization/authorize.interceptor';
@@ -26,7 +29,9 @@ import { ProgressRingComponent } from './shared/progress-ring/progress-ring.comp
     // Dashboard Components
     DashboardComponent,
     TaskCardComponent,
-    ProgressRingComponent
+    ProgressRingComponent,
+    // Modal Components
+    TaskModalComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

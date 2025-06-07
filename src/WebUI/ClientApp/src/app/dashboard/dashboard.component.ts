@@ -4,6 +4,7 @@ import { takeUntil } from 'rxjs/operators';
 import { TaskService } from '../services/task.service';
 import { Task } from '../models/task.model';
 import { User } from '../models/user.model';
+import { TaskFormData } from '../shared/task-modal/task-modal.component';
 
 interface TaskStats {
   total: number;
@@ -42,6 +43,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   // Task data
   tasks: Task[] = [];
+
+  // Modal state
+  isTaskModalOpen = false;
+  showDebug = true; // Set to false in production
+  lastCreatedTask: Task | null = null; // For debugging
 
   constructor(private taskService: TaskService) {}
 
@@ -118,7 +124,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     };
   }
 
-  // Methods
+  // Search Methods
   onSearch(): void {
     // Search is handled by the computed properties
     // This method can be used for additional search logic like debouncing
@@ -137,12 +143,71 @@ export class DashboardComponent implements OnInit, OnDestroy {
     );
   }
 
+  // Modal Methods
   addNewTask(): void {
-    // This will open a modal or navigate to task creation
-    console.log('Adding new task...');
-    // Implementation will be added when we create the task creation modal
+    this.isTaskModalOpen = true;
   }
 
+  closeTaskModal(): void {
+    this.isTaskModalOpen = false;
+  }
+
+  onNewTaskCreate(taskData: TaskFormData): void {
+    // Create new task object
+    const newTask: Task = {
+      id: this.generateTaskId(),
+      title: taskData.title,
+      description: taskData.description,
+      dueDate: new Date(taskData.dueDate),
+      priority: taskData.priority,
+      status: 'Not Started',
+      image: taskData.image || undefined, // Handle image properly
+      tags: [],
+      backgroundColor: '#FFFFFF',
+      isDeleted: false,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    // Add to local tasks array first for immediate UI update
+    this.tasks = [newTask, ...this.tasks]; // Use spread operator for immutability
+
+    // Save to backend via service (only include properties that exist in CreateTaskRequest)
+    this.taskService.createTask({
+      title: newTask.title,
+      description: newTask.description,
+      dueDate: newTask.dueDate,
+      priority: newTask.priority,
+      tags: newTask.tags,
+      backgroundColor: newTask.backgroundColor
+    }).pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (createdTask) => {
+        // Update local task with server response
+        const index = this.tasks.findIndex(t => t.id === newTask.id);
+        if (index !== -1) {
+          this.tasks[index] = { ...createdTask };
+        }
+        console.log('Task created successfully:', createdTask.id);
+      },
+      error: (error) => {
+        // Handle error - remove from local array if server request fails
+        this.tasks = this.tasks.filter(t => t.id !== newTask.id);
+        console.error('Failed to create task:', error);
+        // You might want to show a user-friendly error message here
+      }
+    });
+
+    // Close modal (this should be handled by the modal component, not here)
+    this.isTaskModalOpen = false;
+  }
+
+  private generateTaskId(): string {
+    // Generate a temporary ID for local use
+    return 'temp-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+  }
+
+  // Task Management Methods
   onTaskUpdated(updatedTask: Task): void {
     // Update the task in our local array
     const index = this.tasks.findIndex(t => t.id === updatedTask.id);
@@ -185,15 +250,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       });
   }
 
-  logout(): void {
-    // Implement logout logic
-    console.log('Logging out...');
-    // This would typically call an authentication service
-  }
-
-  // ===== MISSING METHODS - ADD THESE =====
-
-  // Helper method to get status class for task status indicators
+  // Helper Methods for Template
   getStatusClass(status: string): string {
     switch (status?.toLowerCase()) {
       case 'not started':
@@ -207,7 +264,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Helper method to get priority class for priority badges
   getPriorityClass(priority: string): string {
     switch (priority?.toLowerCase()) {
       case 'high':
@@ -221,7 +277,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Helper method to get completed time for completed tasks
   getCompletedTime(task: Task): string {
     if (!task.completedAt && !task.updatedAt) {
       return 'recently';
@@ -248,9 +303,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ===== EXISTING UTILITY METHODS =====
-
-  // Utility methods
+  // Utility Methods
   formatDate(date: Date): string {
     return new Intl.DateTimeFormat('en-US', {
       month: 'short',
@@ -264,5 +317,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   getTaskStatusClass(status: string): string {
     return `status-${status.toLowerCase().replace(' ', '-')}`;
+  }
+
+  // Authentication
+  logout(): void {
+    // Implement logout logic
+    console.log('Logging out...');
+    // This would typically call an authentication service
   }
 }
