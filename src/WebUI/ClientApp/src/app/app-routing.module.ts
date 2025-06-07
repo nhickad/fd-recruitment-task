@@ -1,18 +1,28 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { AuthorizeGuard } from '../api-authorization/authorize.guard';
-import { HomeComponent } from './home/home.component';
-import { CounterComponent } from './counter/counter.component';
-import { FetchDataComponent } from './fetch-data/fetch-data.component';
-import { TodoComponent } from './todo/todo.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 import { TokenComponent } from './token/token.component';
 
+// Temporarily remove AuthorizeGuard to test if dashboard loads
 export const routes: Routes = [
-  { path: '', component: HomeComponent, pathMatch: 'full' },
-  { path: 'counter', component: CounterComponent },
-  { path: 'fetch-data', component: FetchDataComponent },
-  { path: 'todo', component: TodoComponent },
-  { path: 'token', component: TokenComponent, canActivate: [AuthorizeGuard] }
+  { 
+    path: '', 
+    component: DashboardComponent, 
+    pathMatch: 'full' 
+  },
+  { 
+    path: 'dashboard', 
+    component: DashboardComponent 
+  },
+  { 
+    path: 'token', 
+    component: TokenComponent 
+  },
+  // Redirect any unknown routes to dashboard
+  { 
+    path: '**', 
+    redirectTo: '' 
+  }
 ];
 
 @NgModule({

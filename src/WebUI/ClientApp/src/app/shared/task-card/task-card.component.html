@@ -1,0 +1,95 @@
+<!-- Task-card.component.html-->
+<div class="task-card"
+    [class.completed]="isCompleted"
+    [style.background-color]="task.backgroundColor || '#FFFFFF'">
+
+    <!-- Task Image -->
+    <div class="task-image" *ngIf="task.image">
+        <img [src]="task.image" [alt]="task.title" />
+        <div class="task-overlay">
+            <button class="task-action-btn" (click)="toggleTaskStatus()"
+                [title]="getStatusToggleTitle()">
+                <i [class]="getStatusIcon()"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Task Content -->
+    <div class="task-content">
+        <!-- Task Header -->
+        <div class="task-header">
+            <div class="task-priority" [class]="getPriorityClass()">
+                {{ task.priority }}
+            </div>
+            <div class="task-actions">
+                <button class="action-btn edit-btn" (click)="editTask()"
+                    title="Edit task">
+                    <i class="icon-edit"></i>
+                </button>
+                <button class="action-btn delete-btn" (click)="deleteTask()"
+                    title="Delete task">
+                    <i class="icon-delete"></i>
+                </button>
+                <button class="action-btn menu-btn" (click)="showMenu()"
+                    title="More options">
+                    <i class="icon-menu"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Task Title -->
+        <h3 class="task-title" [class.completed-text]="isCompleted">
+            {{ task.title }}
+        </h3>
+
+        <!-- Task Description -->
+        <p class="task-description" [class.completed-text]="isCompleted">
+            {{ task.description }}
+        </p>
+
+        <!-- Task Tags -->
+        <div class="task-tags" *ngIf="task.tags && task.tags.length > 0">
+            <span class="task-tag" *ngFor="let tag of task.tags">
+                {{ tag }}
+            </span>
+        </div>
+
+        <!-- Task Footer -->
+        <div class="task-footer">
+            <div class="task-status">
+                <span class="status-indicator"
+                    [class]="getStatusClass()"></span>
+                <span class="status-text">{{ task.status }}</span>
+            </div>
+
+            <div class="task-due-date" [class.overdue]="isOverdue()">
+                <i class="icon-calendar"></i>
+                <span>{{ formatDueDate() }}</span>
+            </div>
+        </div>
+
+        <!-- Completed Tasks Footer (Different Layout) -->
+        <div class="completed-footer" *ngIf="isCompleted">
+            <div class="completion-info">
+                <span class="completion-text">Completed {{ getCompletedTime()
+                    }}</span>
+            </div>
+            <button class="restore-btn" (click)="restoreTask()"
+                title="Mark as incomplete">
+                <i class="icon-restore"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Color Picker (Hidden by default, will be shown when implementing color feature) -->
+    <div class="color-picker" *ngIf="showColorPicker">
+        <div class="color-options">
+            <button class="color-option"
+                *ngFor="let color of colorOptions"
+                [style.background-color]="color"
+                (click)="changeTaskColor(color)"
+                [class.selected]="task.backgroundColor === color">
+            </button>
+        </div>
+    </div>
+</div>
